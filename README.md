@@ -10,8 +10,10 @@ This is a swift script file written in Swift 3, and assume you have Xcode 8 inst
 
 ## Installation
 Add execution permissions to the *main.swift*:
+
 `chmod +x main.swift`
 
 Copy & Rename the main.swift to folder in your PATH, for example:
+
 `sudo cp main.swift /usr/local/bin/i1n`
 
