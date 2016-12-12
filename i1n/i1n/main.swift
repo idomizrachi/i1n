@@ -12,11 +12,37 @@ extension String {
             return nil
         }
     }
+    
+    func appendTo(path : String) -> Bool {
+        guard FileManager.default.fileExists(atPath: path) else {
+            return false
+        }
+        let pathUrl = URL(fileURLWithPath: path)
+        let data = self.data(using: String.Encoding.utf8)
+        guard data != nil else {
+            return false
+        }
+        do {
+            let fileHandle = try FileHandle(forWritingTo: pathUrl)
+            fileHandle.seekToEndOfFile()
+            fileHandle.write(data!)
+            fileHandle.closeFile()
+        } catch {
+            do {
+                try data!.write(to: pathUrl, options: .atomic)
+            } catch {
+                return false
+            }
+            return false
+        }
+        return true
+    }
 }
 
 struct LocalizationEntry {
     var path : String
     var key : String
+    var value : String
 }
 
 class PropertyName {
@@ -85,7 +111,10 @@ func parseLocalizationFile(_ file : String) -> [LocalizationEntry] {
             line.remove(at: line.startIndex)
             if let index = line.characters.index(of: "\"") {
                 let key = line.substring(to: index)
-                localizationEntries.append(LocalizationEntry(path: file, key: key))
+                let lastIndex = line.lastIndex(of: "\"")
+                let range =  line.characters.index(index, offsetBy: 5)..<line.characters.index(line.startIndex, offsetBy: lastIndex!)
+                let value = line.substring(with: range)
+                localizationEntries.append(LocalizationEntry(path: file, key: key, value: value))
             }
         }
     } catch {
@@ -101,7 +130,14 @@ func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEn
         let language = localizationFileLanguage(file)
         report.language = language
         if !nonEnglisEnries.contains(where: { $0.key == englishEntry.key }) {
-            report.missingKeys.append(englishEntry.key)            
+            report.missingKeys.append(englishEntry.key)
+            let defaultValue = "\n\"\(englishEntry.key)\" = \"\(englishEntry.value)\";"
+            let writeResult = defaultValue.appendTo(path: file)
+            if writeResult {
+                print("Added \(englishEntry.key) to \(file)")
+            } else {
+                print("Failed to add \(englishEntry.key) to \(file)")
+            }
         }
     }
     return report
