@@ -101,8 +101,7 @@ func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEn
         let language = localizationFileLanguage(file)
         report.language = language
         if !nonEnglisEnries.contains(where: { $0.key == englishEntry.key }) {
-            report.missingKeys.append(englishEntry.key)
-            print("\tMissing \(englishEntry.key) for \(language) in \(file)")
+            report.missingKeys.append(englishEntry.key)            
         }
     }
     return report
