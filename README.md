@@ -4,4 +4,3 @@ to all other available languages.
 The result is a report with all keys available in for english but missing for other languages.
 
 This project is still in early stages.
-
