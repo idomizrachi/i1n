@@ -41,3 +41,6 @@ Search for missing keys in non-english localization files...
 
 Finished, no missing localization entries.
 ```
+
+# Thanks
+To <a href=http://twitter.com/catalinred>Catalin Rosu</a> for the HTML template!
