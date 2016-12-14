@@ -298,7 +298,7 @@ print("Parsing all keys in the english localization file...")
 let englishEntries = parseLocalizationFile(englishLocalizationFile)
 print("\tDone")
 
-print("Search for missing keys in non-english localization files...")
+print("Searching for missing keys in non-english localization files...")
 
 var report = Report()
 for file in files {
