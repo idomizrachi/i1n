@@ -20,35 +20,31 @@ Copy & Rename the *main.swift* to folder in your PATH, for example:
 `sudo cp main.swift /usr/local/bin/i1n`
 
 ## Execution
-Run the *i1n* script from the root of your project:
+Run the **i1n** script from the root of your project (assuming i1n exists at /usr/local/bin/i1n):
 
 `i1n`
 
 Sample output:
 
-```bash
-Searching for english localization file...
-
-	English localization file found:
-  
-	 /Users/ido.mizrachi/Dev/MyProject/Resources/en.lproj/Localizable.strings
-   
-Parsing all keys in the english localization file...
-
-	Done
-  
-Search for missing keys in non-english localization files...
-
-Finished, no missing localization entries.
-```
+![alt-text][execution]
 
 ##Demo 
-You can run *i1n* on the Demo project to see it in action.
+You can run **i1n** on the Demo project to see it in action.
 
 ![alt text][report]
+
+## Adding the missing keys with default value
+Running **i1n -a** will add the missing keys to the localization files with their english values.
+
+![alt text][missing-base]
+
+![alt-text-][missing-spanish]
+
 
 # Thanks
 To <a href=http://twitter.com/catalinred>Catalin Rosu</a> for the HTML template!
 
-
-[report]: https://raw.githubusercontent.com/idomizrachi/i1n/4f08ed8df166ff9d167391d2d813955d6831a715/Demo/Demo-Report.png "Report"
+[execution]: https://raw.githubusercontent.com/idomizrachi/i1n/master/Demo/Sample-Execution.png "Execution"
+[report]: https://raw.githubusercontent.com/idomizrachi/i1n/master/Demo/Demo-Report.png "Report"
+[missing-base]: https://raw.githubusercontent.com/idomizrachi/i1n/master/Demo/Base-Missing-Keys.png "Missing Base"
+[missing-spanish]: https://raw.githubusercontent.com/idomizrachi/i1n/master/Demo/Spanish-Missing-Keys.png
