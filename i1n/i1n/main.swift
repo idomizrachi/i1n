@@ -143,9 +143,13 @@ func parseLocalizationFile(_ file : String) -> [LocalizationEntry] {
 
 func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEntry], addMissingEntries : Bool) -> LanguageReport {
     var report = LanguageReport(language: "", file: file, missingKeys: [])
+    guard let language = localizationFileLanguage(file) else {
+        print("Unknown language for file: \(file)")
+        print("Skipping")
+        return report
+    }
     let nonEnglisEnries = parseLocalizationFile(file)
     for englishEntry in englishEntries {
-        let language = localizationFileLanguage(file)
         report.language = language
         if !nonEnglisEnries.contains(where: { $0.key == englishEntry.key }) {
             report.missingKeys.append(englishEntry.key)
