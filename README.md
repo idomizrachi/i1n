@@ -42,5 +42,13 @@ Search for missing keys in non-english localization files...
 Finished, no missing localization entries.
 ```
 
+##Demo 
+You can run *i1n* on the Demo project to see it in action.
+
+![alt text][report]
+
 # Thanks
 To <a href=http://twitter.com/catalinred>Catalin Rosu</a> for the HTML template!
+
+
+[report]: https://raw.githubusercontent.com/idomizrachi/i1n/4f08ed8df166ff9d167391d2d813955d6831a715/Demo/Demo-Report.png "Report"
