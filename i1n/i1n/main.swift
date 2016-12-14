@@ -85,6 +85,24 @@ class Report {
     }
 }
 
+class ArgumentsParser {
+    var printUsage : Bool = false
+    var addMissingEntries : Bool = false
+    
+    init(arguments : [String]) {
+        parse(arguments)
+    }
+    
+    func parse(_ arguments : [String]) {
+        if (arguments.contains("--help") || arguments.contains("-h")) {
+            printUsage = true
+        }
+        if (arguments.contains("-a")) {
+            addMissingEntries = true
+        }
+    }
+}
+
 func findLocalizationFiles(atPath path : String) -> [String] {
     let fileManager = FileManager.default
     let enumerator = fileManager.enumerator(atPath: path)
@@ -123,7 +141,7 @@ func parseLocalizationFile(_ file : String) -> [LocalizationEntry] {
     return localizationEntries
 }
 
-func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEntry]) -> LanguageReport {
+func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEntry], addMissingEntries : Bool) -> LanguageReport {
     var report = LanguageReport(language: "", file: file, missingKeys: [])
     let nonEnglisEnries = parseLocalizationFile(file)
     for englishEntry in englishEntries {
@@ -131,12 +149,14 @@ func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEn
         report.language = language
         if !nonEnglisEnries.contains(where: { $0.key == englishEntry.key }) {
             report.missingKeys.append(englishEntry.key)
-            let defaultValue = "\n\"\(englishEntry.key)\" = \"\(englishEntry.value)\";"
-            let writeResult = defaultValue.appendTo(path: file)
-            if writeResult {
-                print("Added \(englishEntry.key) to \(file)")
-            } else {
-                print("Failed to add \(englishEntry.key) to \(file)")
+            if addMissingEntries {
+                let defaultValue = "\n\"\(englishEntry.key)\" = \"\(englishEntry.value)\";"
+                let writeResult = defaultValue.appendTo(path: file)
+                if writeResult {
+                    print("Added \(englishEntry.key) to \(file)")
+                } else {
+                    print("Failed to add \(englishEntry.key) to \(file)")
+                }
             }
         }
     }
@@ -227,10 +247,27 @@ func generateHtmlReport(_ report : Report) {
     }
 }
 
+func printUsage() {
+    let options : [[String]] = [["-a", "Add missing entries with their english value"]]
+    print("Usage:")
+    print("\ti1n [options]")
+    print("Options:")
+    for option in options {
+        print("\t\(option[0]) \t\t\t \(option[1])")
+    }
+}
+
 
 //MARK: Main
 
 //Scan for all localization files
+let argumentsParser = ArgumentsParser(arguments: CommandLine.arguments)
+if argumentsParser.printUsage {
+    printUsage()
+    exit(EXIT_SUCCESS)
+}
+
+
 print("Searching for english localization file...")
 let files = findLocalizationFiles(atPath: FileManager.default.currentDirectoryPath)
 
@@ -261,7 +298,7 @@ for file in files {
     guard file != englishLocalizationFile else {
         continue
     }
-    let languageReport = searchForMissingKeys(inFile: file, englishEntries: englishEntries)
+    let languageReport = searchForMissingKeys(inFile: file, englishEntries: englishEntries, addMissingEntries: argumentsParser.addMissingEntries)
     report.allLanguages.append(languageReport)
 }
 
