@@ -1,0 +1,10 @@
+/* 
+  Localizable.strings
+  Demo
+
+  Created by Ido Mizrachi on 12/14/16.
+  Copyright © 2016 Ido Mizrachi. All rights reserved.
+*/
+
+"title.login" = "Iniciar sesión";
+"title.about" = "Acerca de";

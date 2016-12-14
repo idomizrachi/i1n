@@ -1,0 +1,12 @@
+/* 
+  Localizable.strings
+  Demo
+
+  Created by Ido Mizrachi on 12/14/16.
+  Copyright © 2016 Ido Mizrachi. All rights reserved.
+*/
+
+"title.login" = "Login";
+"title.about" = "About";
+"input.username" = "Username";
+"input.password" = "Password";
