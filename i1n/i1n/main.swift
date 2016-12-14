@@ -167,13 +167,16 @@ func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEn
     return report
 }
 
-func localizationFileLanguage(_ file : String) -> String {
+func localizationFileLanguage(_ file : String) -> String? {
     var localizationCode = file.substring(to: file.index(file.endIndex, offsetBy: -(".lproj/Localizable.strings".characters.count)))
     let lastIndexOfDash = localizationCode.lastIndex(of: "/")
     guard lastIndexOfDash != nil else {
         return ""
     }
     localizationCode = localizationCode.substring(from: file.index(file.startIndex, offsetBy: lastIndexOfDash!+1))
+    if localizationCode == "Base" {
+        return localizationCode
+    }
     let codeToLanguage = [
         "en" : "English",
         "en-GB" : "English (British)",
@@ -217,7 +220,7 @@ func localizationFileLanguage(_ file : String) -> String {
         "he" : "Hebrew",
         "ar" : "Arabic"
     ]
-    return codeToLanguage[localizationCode]!
+    return codeToLanguage[localizationCode]
 }
 
 func generateHtmlReport(_ report : Report) {
@@ -280,6 +283,7 @@ var englishLocalizationFile = ""
 for file in files {
     if file.hasSuffix("en.lproj/Localizable.strings") {
         englishLocalizationFile = file
+        break
     }
 }
 if englishLocalizationFile == "" {
