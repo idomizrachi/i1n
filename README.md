@@ -40,6 +40,8 @@ Running **i1n -a** will add the missing keys to the localization files with thei
 
 ![alt-text-][missing-spanish]
 
+## Known Issues
+* Localization keys with " are not supported yet.
 
 # Thanks
 To <a href=http://twitter.com/catalinred>Catalin Rosu</a> for the HTML template!
