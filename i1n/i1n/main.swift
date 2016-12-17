@@ -128,11 +128,15 @@ func parseLocalizationFile(_ file : String) -> [LocalizationEntry] {
             }
             line.remove(at: line.startIndex)
             if let index = line.characters.index(of: "\"") {
-                let key = line.substring(to: index)
-                let lastIndex = line.lastIndex(of: "\"")
-                let range =  line.characters.index(index, offsetBy: 5)..<line.characters.index(line.startIndex, offsetBy: lastIndex!)
-                let value = line.substring(with: range)
-                localizationEntries.append(LocalizationEntry(path: file, key: key, value: value))
+                let key = localizationKeyFromLine(line)
+                if let key = key {
+                    let lastIndex = line.lastIndex(of: "\"")
+                    let range =  line.characters.index(index, offsetBy: 5)..<line.characters.index(line.startIndex, offsetBy: lastIndex!)
+                    let value = line.substring(with: range)
+                    localizationEntries.append(LocalizationEntry(path: file, key: key, value: value))
+                } else {
+                    print("Failed to parse line: \(line)")
+                }
             }
         }
     } catch {
@@ -140,6 +144,24 @@ func parseLocalizationFile(_ file : String) -> [LocalizationEntry] {
     }
     return localizationEntries
 }
+
+func localizationKeyFromLine(_ line : String) -> String? {
+    var previousCharacter : Character = "\0"
+    var endOfKeyIndex : String.CharacterView.Index? = nil
+    for index in line.characters.indices {
+        if line[index] == "\"" && previousCharacter != "\\" {
+            //End of key
+            endOfKeyIndex = index
+            break
+        }
+        previousCharacter = line[index]
+    }
+    guard endOfKeyIndex != nil else {
+        return nil
+    }
+    return line.substring(to: endOfKeyIndex!)
+}
+
 
 func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEntry], addMissingEntries : Bool) -> LanguageReport {
     var report = LanguageReport(language: "", file: file, missingKeys: [])
@@ -220,7 +242,10 @@ func localizationFileLanguage(_ file : String) -> String? {
         "he" : "Hebrew",
         "ar" : "Arabic"
     ]
-    return codeToLanguage[localizationCode]
+    if let language = codeToLanguage[localizationCode] {
+        return language
+    }
+    return localizationCode
 }
 
 func generateHtmlReport(_ report : Report) {
