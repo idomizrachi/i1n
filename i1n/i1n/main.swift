@@ -2,8 +2,9 @@
 
 import Foundation
 
-//MARK: Infrastructure
+let version = "0.0.1"
 
+//MARK: Infrastructure
 extension String {
     func lastIndex(of target: String) -> Int? {
         if let range = self.range(of: target, options: .backwards) {
@@ -87,6 +88,7 @@ class Report {
 
 class ArgumentsParser {
     var printUsage : Bool = false
+    var printVersion : Bool = false
     var addMissingEntries : Bool = false
     
     init(arguments : [String]) {
@@ -96,6 +98,9 @@ class ArgumentsParser {
     func parse(_ arguments : [String]) {
         if (arguments.contains("--help") || arguments.contains("-h")) {
             printUsage = true
+        }
+        if (arguments.contains("--version") || arguments.contains("-v")) {
+            printVersion = true
         }
         if (arguments.contains("-a")) {
             addMissingEntries = true
@@ -289,6 +294,10 @@ func printUsage() {
     }
 }
 
+func printVersion() {
+    print("\(version)")
+}
+
 
 //MARK: Main
 
@@ -296,6 +305,10 @@ func printUsage() {
 let argumentsParser = ArgumentsParser(arguments: CommandLine.arguments)
 if argumentsParser.printUsage {
     printUsage()
+    exit(EXIT_SUCCESS)
+}
+if argumentsParser.printVersion {
+    printVersion()
     exit(EXIT_SUCCESS)
 }
 
