@@ -345,7 +345,7 @@ if argumentsParser.printVersion {
 
 
 print("Searching for english localization file...")
-let files = findLocalizationFiles(atPath: "/Users/ido.mizrachi/Dev/Daily-iOS/JiveDaily")//FileManager.default.currentDirectoryPath)
+let files = findLocalizationFiles(atPath: FileManager.default.currentDirectoryPath)
 
 //Mark the english localization files
 var englishLocalizationFile = ""
