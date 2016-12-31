@@ -175,10 +175,15 @@ func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEn
         print("Skipping")
         return report
     }
-    let nonEnglisEnries = parseLocalizationFile(file)
+    let nonEnglishEnries = parseLocalizationFile(file)
     for englishEntry in englishEntries {
         report.language = language
-        if !nonEnglisEnries.contains(where: { $0.key == englishEntry.key }) {
+        if !nonEnglishEnries.contains(where: { $0.key == englishEntry.key }) {
+            if shouldIgnoreSingularKeyFor(language) && hasSingularSuffix(englishEntry.key) {
+                if nonEnglishEnries.contains(where: { $0.key == removeSingularSuffix(englishEntry.key) + "##{other}" }) {
+                    continue
+                }
+            }
             report.missingKeys.append(englishEntry.key)
             if addMissingEntries {
                 let defaultValue = "\n\"\(englishEntry.key)\" = \"\(englishEntry.value)\";"
@@ -192,6 +197,24 @@ func searchForMissingKeys(inFile file : String, englishEntries : [LocalizationEn
         }
     }
     return report
+}
+
+func shouldIgnoreSingularKeyFor(_ language: String) -> Bool {
+    switch language {
+    case "Japanese", "Korean","Thai","Chinese (Simplified)","Chinese (Traditional)":
+        return true
+    default:
+        return false
+    }
+}
+
+func hasSingularSuffix(_ key: String) -> Bool {
+    return key.hasSuffix("##{one}")
+}
+
+func removeSingularSuffix(_ key: String) -> String {
+    let index = key.index(key.endIndex, offsetBy: -("##{one}".characters.count))
+    return key.substring(to: index)
 }
 
 func localizationFileLanguage(_ file : String) -> String? {
@@ -262,6 +285,9 @@ func generateHtmlReport(_ report : Report) {
     output += "</head>"
     output += "<body>"
     for language in report.allLanguages {
+        if language.missingKeys.count == 0 {
+            continue
+        }
         output += "<h2>\(language.language)</h2>"
         output += "<h3>\(language.file)</h3>"
         output += "<table class=zebra><tr><th>Key</th></tr>"
@@ -270,6 +296,11 @@ func generateHtmlReport(_ report : Report) {
         }
         output += "<tr><th>Total: \(language.missingKeys.count)</th></tr>"
         output += "</table>"
+    }
+    let languagesMissingCount = report.allLanguages.map { $0.missingKeys.count }
+    let totalCount = languagesMissingCount.reduce(0, { $0 + $1 })
+    if (totalCount == 0) {
+        output += "<h2>No misssing keys</h2>"
     }
     output += "<br /><br /><p>Thanks to <a href=http://twitter.com/catalinred>Catalin Rosu</a> for the HTML template!</p>"
     output += "</body>"
@@ -314,7 +345,7 @@ if argumentsParser.printVersion {
 
 
 print("Searching for english localization file...")
-let files = findLocalizationFiles(atPath: FileManager.default.currentDirectoryPath)
+let files = findLocalizationFiles(atPath: "/Users/ido.mizrachi/Dev/Daily-iOS/JiveDaily")//FileManager.default.currentDirectoryPath)
 
 //Mark the english localization files
 var englishLocalizationFile = ""
