@@ -90,6 +90,7 @@ class ArgumentsParser {
     var printUsage : Bool = false
     var printVersion : Bool = false
     var addMissingEntries : Bool = false
+    var statisticReport : Bool = false
     
     init(arguments : [String]) {
         parse(arguments)
@@ -104,6 +105,9 @@ class ArgumentsParser {
         }
         if (arguments.contains("-a")) {
             addMissingEntries = true
+        }
+        if (arguments.contains("--statistic") || arguments.contains("-s")) {
+            statisticReport = true
         }
     }
 }
@@ -315,8 +319,48 @@ func generateHtmlReport(_ report : Report) {
     }
 }
 
+func generateStatisticHtmlReport(_ report : Report) {
+    var output = "<!DOCTYPE html>"
+    output += "<html>"
+    output += "<head>"
+    output += "<title>Localization Report</title>"
+    output += "<style>body{width:800px;margin:40px auto;font-family:'trebuchet MS','Lucida sans',Arial;font-size:14px;color:#444}table{*border-collapse:collapse;border-spacing:0;width:100%}.bordered{border:solid #ccc 1px;-moz-border-radius:6px;-webkit-border-radius:6px;border-radius:6px;-webkit-box-shadow:0 1px 1px #ccc;-moz-box-shadow:0 1px 1px #ccc;box-shadow:0 1px 1px #ccc}.bordered tr:hover{background:#fbf8e9;-o-transition:all .1s ease-in-out;-webkit-transition:all .1s ease-in-out;-moz-transition:all .1s ease-in-out;-ms-transition:all .1s ease-in-out;transition:all .1s ease-in-out}.bordered td,.bordered th{border-left:1px solid #ccc;border-top:1px solid #ccc;padding:10px;text-align:left}.bordered th{background-color:#dce9f9;background-image:-webkit-gradient(linear,left top,left bottom,from(#ebf3fc),to(#dce9f9));background-image:-webkit-linear-gradient(top,#ebf3fc,#dce9f9);background-image:-moz-linear-gradient(top,#ebf3fc,#dce9f9);background-image:-ms-linear-gradient(top,#ebf3fc,#dce9f9);background-image:-o-linear-gradient(top,#ebf3fc,#dce9f9);background-image:linear-gradient(top,#ebf3fc,#dce9f9);-webkit-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;-moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;box-shadow:0 1px 0 rgba(255,255,255,.8) inset;border-top:0;text-shadow:0 1px 0 rgba(255,255,255,.5)}.bordered td:first-child,.bordered th:first-child{border-left:none}.bordered th:first-child{-moz-border-radius:6px 0 0 0;-webkit-border-radius:6px 0 0 0;border-radius:6px 0 0 0}.bordered th:last-child{-moz-border-radius:0 6px 0 0;-webkit-border-radius:0 6px 0 0;border-radius:0 6px 0 0}.bordered th:only-child{-moz-border-radius:6px 6px 0 0;-webkit-border-radius:6px 6px 0 0;border-radius:6px 6px 0 0}.bordered tr:last-child td:first-child{-moz-border-radius:0 0 0 6px;-webkit-border-radius:0 0 0 6px;border-radius:0 0 0 6px}.bordered tr:last-child td:last-child{-moz-border-radius:0 0 6px 0;-webkit-border-radius:0 0 6px 0;border-radius:0 0 6px 0}.zebra td,.zebra th{padding:10px;border-bottom:1px solid #f2f2f2}.zebra tbody tr:nth-child(even){background:#f5f5f5;-webkit-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;-moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;box-shadow:0 1px 0 rgba(255,255,255,.8) inset}.zebra th{text-align:left;text-shadow:0 1px 0 rgba(255,255,255,.5);border-bottom:1px solid #ccc;background-color:#eee;background-image:-webkit-gradient(linear,left top,left bottom,from(#f5f5f5),to(#eee));background-image:-webkit-linear-gradient(top,#f5f5f5,#eee);background-image:-moz-linear-gradient(top,#f5f5f5,#eee);background-image:-ms-linear-gradient(top,#f5f5f5,#eee);background-image:-o-linear-gradient(top,#f5f5f5,#eee);background-image:linear-gradient(top,#f5f5f5,#eee)}.zebra th:first-child{-moz-border-radius:6px 0 0 0;-webkit-border-radius:6px 0 0 0;border-radius:6px 0 0 0}.zebra th:last-child{-moz-border-radius:0 6px 0 0;-webkit-border-radius:0 6px 0 0;border-radius:0 6px 0 0}.zebra th:only-child{-moz-border-radius:6px 6px 0 0;-webkit-border-radius:6px 6px 0 0;border-radius:6px 6px 0 0}.zebra tfoot td{border-bottom:0;border-top:1px solid #fff;background-color:#f1f1f1}.zebra tfoot td:first-child{-moz-border-radius:0 0 0 6px;-webkit-border-radius:0 0 0 6px;border-radius:0 0 0 6px}.zebra tfoot td:last-child{-moz-border-radius:0 0 6px 0;-webkit-border-radius:0 0 6px 0;border-radius:0 0 6px 0}.zebra tfoot td:only-child{-moz-border-radius:0 0 6px 6px;-webkit-border-radius:0 0 6px 6px border-radius:0 0 6px 6px}</style>"
+    output += "</head>"
+    output += "<body>"
+    var keys : Set<String> = []
+    for language in report.allLanguages {
+        if language.missingKeys.count == 0 {
+            continue
+        }
+        for key in language.missingKeys {
+            keys.insert(key)
+        }
+    }
+    if (keys.count == 0) {
+        output += "<h1>No misssing keys</h1>"
+    } else {
+        output += "<h1>\(keys.count) Missing Keys</h1>"
+        output += "<table class=zebra><tr><th>Key</th></tr>"
+        for key in keys {
+            output += "<tr><td>\(key)</td></tr>"
+        }
+        output += "</table>"
+    }
+    output += "<br /><br /><p>Thanks to <a href=http://twitter.com/catalinred>Catalin Rosu</a> for the HTML template!</p>"
+    output += "</body>"
+    output += "</html>"
+    
+    let reportFile = FileManager.default.currentDirectoryPath.appending("/report.html")
+    let reportFileUrl = URL(fileURLWithPath: reportFile)
+    do {
+        try output.write(to: reportFileUrl, atomically: true, encoding: String.Encoding.utf8)
+    } catch {
+        print("Failed to write report to \(reportFileUrl)")
+    }
+}
+
 func printUsage() {
-    let options : [[String]] = [["-a", "Add missing entries with their english value"]]
+    let options : [[String]] = [["-a", "Add missing entries with their english value"], ["-s", "Generate statistic report"]]
     print("Usage:")
     print("\ti1n [options]")
     print("Options:")
@@ -379,7 +423,11 @@ for file in files {
     report.allLanguages.append(languageReport)
 }
 
-generateHtmlReport(report)
+if argumentsParser.statisticReport {
+    generateStatisticHtmlReport(report)
+} else {
+    generateHtmlReport(report)
+}
 
 let missingEntriesCount = report.missingEntriesCount()
 if missingEntriesCount == 0 {
