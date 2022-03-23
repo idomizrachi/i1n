@@ -28,7 +28,7 @@ Sample output:
 
 ![alt-text][execution]
 
-##Demo 
+## Demo 
 You can run **i1n** on the Demo project to see it in action.
 
 ![alt text][report]
